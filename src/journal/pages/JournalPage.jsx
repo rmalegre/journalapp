@@ -8,8 +8,8 @@ export const JournalPage = () => {
   return (
     <div>
         <JournalLayout>
-        {/* <NothingSelectedView />  */}
-         <NoteView />
+        <NothingSelectedView /> 
+         {/* <NoteView /> */}
 
          <IconButton
           size='large'

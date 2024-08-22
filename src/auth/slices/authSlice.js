@@ -3,13 +3,15 @@ import { createSlice } from "@reduxjs/toolkit";
 export const authSlice = createSlice({
   name: "auth",
   initialState: {
-    status: "not-authenticated", // authenticated , not-authenticated
+    status: "not-authenticated", // 'not-authenticated', 'authenticated'
     uid: null,
     email: null,
     displayName: null,
     photoURL: null,
     errorMessage: null,
   },
+  // The `reducers` field lets us define reducers and generate associated actions
+  
 
   reducers: {
     login: (state, { payload }) => {

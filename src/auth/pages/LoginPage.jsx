@@ -1,5 +1,5 @@
-import { useDispatch } from 'react-redux';
-import { Button } from "@mui/material";
+import { useDispatch, useSelector } from 'react-redux';
+import { Alert, Button } from "@mui/material";
 import { Grid } from "@mui/material";
 import { Typography } from "@mui/material";
 import { TextField } from "@mui/material";
@@ -8,29 +8,31 @@ import { Link, Link as RouterLink } from "react-router-dom";
 import { AuthLayout } from "../layout/AuthLayout";
 import { useForm } from "../../hooks/useForm";
 import { checkingCredentials } from '../slices';
+import { startGoogleSignIn, startLoginWithEmailPassword } from '../thunks';
+import { useMemo } from 'react';
 
 export const LoginPage = () => {
   const dispatch = useDispatch();
+  const { status, errorMessage} = useSelector( state => state.auth)
+
   const { email, password, onInputChange }= useForm ({
     email: '',
     password: '',
   })
-
-
+  const isAuthenticating = useMemo(() => status === "checking", [status])
 
   const onSubmit = ( event )  => {
     event.preventDefault();
-    console.log({ email, password });
+    dispatch(startLoginWithEmailPassword({ email, password }));
   }
 
   const onSignWithGoogle = () => {
     console.log('Google');
+    dispatch( startGoogleSignIn() );
   }
 
   return (
-
     <AuthLayout title="Login">
-      
       <form onSubmit={onSubmit}>
           <Grid container>
             <Grid item xs={12} sx={{ mt: 2 }} >
@@ -39,13 +41,14 @@ export const LoginPage = () => {
                 label="Email"
                 type="email"
                 name="email"
+                autoComplete="off"
                 value={email} 
                 onChange={onInputChange}
                 placeholder="correo@yahoo.com"
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} sx={{ mt: 2 }}>
+            <Grid item xs={12} sx={{ mb: 2, mt:1 }}>
               <TextField
                 sx={{ mt: 2 }}
                 label="Contraseña"
@@ -57,16 +60,30 @@ export const LoginPage = () => {
                 fullWidth
               />
             </Grid>
-            <Grid container spacing={2} sx={{mt:2}}>
-              <Grid item xs={12} sm={6}>
-                <Button onClick={() => dispatch( checkingCredentials() )} 
-                type="submit" variant="contained"  
-                 color="primary" fullWidth >
-                  Login
-                </Button>
-              </Grid>
+            <Grid container
+               display={errorMessage ? "" :
+              "none"}
+            sx={{mt:1}}
+          >
+            <Grid item xs={12}
+             >
+              <Alert  variant="filled" severity="error">{errorMessage}</Alert>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
+            <Grid item xs={12} sm={6}>
+              <Button
+                disabled={isAuthenticating}
+                type="submit"
+                variant="contained"
+                fullWidth
+              >
+                Login
+              </Button>
+            </Grid>
               <Grid item xs={12} sm={6}>
               <Button 
+              disabled={isAuthenticating}
               onClick={onSignWithGoogle}
               variant="contained" fullWidth>
                 <Google />
